@@ -4,118 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class PageController extends Controller
+class ProductController extends Controller
 {
-    
-    public function login()
+    /**
+     * Display product management page
+     */
+    public function index()
     {
-        return view('login');
-    }
-    
- 
-    public function processLogin(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|min:3',
-            'password' => 'required|string|min:6'
-        ]);
-        
-        $username = $request->input('username');
-        
-       
-        return redirect()->route('dashboard', ['username' => $username]);
-    }
-    
-
-    public function dashboard(Request $request)
-    {
-        $username = $request->get('username');
-       
-        $stats = [
-            'total_products' => 45,
-            'low_stock' => 8,
-            'total_sales' => 1250,
-            'revenue' => 15670000
-        ];
-        
-       
-        $chartData = [
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            'datasets' => [
-                [
-                    'label' => 'Penjualan Dimsum',
-                    'data' => [65, 78, 90, 85, 95, 110],
-                    'backgroundColor' => '#72BF78'
-                ],
-                [
-                    'label' => 'Produk Terjual',
-                    'data' => [45, 60, 75, 80, 88, 95],
-                    'backgroundColor' => '#A0D683'
-                ]
-            ]
-        ];
-        
-       
-        $recentActivities = [
-            [
-                'icon' => 'shopping-cart',
-                'action' => 'Produk baru ditambahkan',
-                'time' => '2 menit yang lalu',
-                'user' => 'Ahmad Rizki'
-            ],
-            [
-                'icon' => 'chart-bar',
-                'action' => 'Laporan penjualan dibuat',
-                'time' => '15 menit yang lalu',
-                'user' => 'Siti Nurhaliza'
-            ],
-            [
-                'icon' => 'exclamation-triangle',
-                'action' => 'Stok Siomay Ayam rendah',
-                'time' => '1 jam yang lalu',
-                'user' => 'System'
-            ],
-            [
-                'icon' => 'trending-up',
-                'action' => 'Penjualan meningkat 15%',
-                'time' => '2 jam yang lalu',
-                'user' => 'System'
-            ]
-        ];
-        
-        return view('dashboard', compact('username', 'stats', 'chartData', 'recentActivities'));
-    }
-    
-    
-    public function profile(Request $request)
-    {
-        $username = $request->get('username');
-        
-        
-        $userProfile = [
-            'name' => $username,
-            'email' => $username . '@gmail.com',
-            'role' => 'Administrator',
-            'join_date' => '2024-01-15',
-            'last_login' => '2024-01-20 14:30:00',
-            'avatar' => '👨‍💼',
-            'bio' => 'Halo, ini adalah halaman profileku',
-            'preferences' => [
-                'theme' => 'Light Mode',
-                'language' => 'Bahasa Indonesia',
-                'notifications' => 'Enabled'
-            ]
-        ];
-        
-        return view('profile', compact('username', 'userProfile'));
-    }
-    
-    
-    public function pengelolaan(Request $request)
-    {
-        $username = $request->get('username');
-        
-      
+        // Mock product data
         $dataList = [
             [
                 'id' => 1,
@@ -199,7 +95,7 @@ class PageController extends Controller
             ]
         ];
         
-      
+        // Management stats
         $managementStats = [
             'total_products' => count($dataList),
             'available_products' => count(array_filter($dataList, fn($product) => $product['status'] === 'Available')),
@@ -207,6 +103,57 @@ class PageController extends Controller
             'out_of_stock' => count(array_filter($dataList, fn($product) => $product['status'] === 'Out of Stock'))
         ];
         
-        return view('pengelolaan', compact('username', 'dataList', 'managementStats'));
+        $role = 'admin';
+        
+        return view('pengelolaan', compact( 'dataList', 'managementStats', 'role'));
+    }
+
+    /**
+     * Show form to create new product
+     */
+    public function create()
+    {
+        $role = 'admin';
+        return view('products.create', compact( 'role'));
+    }
+
+    /**
+     * Store new product
+     */
+    public function store(Request $request)
+    {
+        // TODO: Implement product creation
+        return redirect()->route('products.index', ['username' => $username])
+                        ->with('success', 'Produk berhasil ditambahkan!');
+    }
+
+    /**
+     * Show form to edit product
+     */
+    public function edit($id)
+    {
+        // TODO: Get product from database
+        $role = 'admin';
+        return view('products.edit', compact( 'id', 'role'));
+    }
+
+    /**
+     * Update product
+     */
+    public function update(Request $request, $id)
+    {
+        // TODO: Implement product update
+        return redirect()->route('products.index', ['username' => $username])
+                        ->with('success', 'Produk berhasil diupdate!');
+    }
+
+    /**
+     * Delete product
+     */
+    public function destroy($id)
+    {
+        // TODO: Implement product deletion
+        return redirect()->route('products.index', ['username' => $username])
+                        ->with('success', 'Produk berhasil dihapus!');
     }
 }
