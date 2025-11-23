@@ -96,7 +96,7 @@
                 </div>
 
                 <!-- Staff Management (Admin Only) -->
-                @if (($role ?? 'admin') === 'admin')
+                @if (auth()->check() && auth()->user()->role->name === 'admin')
                     <a href="{{ route('staff.index') }}"
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-primary hover:text-white transition-colors duration-300 {{ request()->routeIs('staff.*') ? 'bg-primary text-white' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +115,7 @@
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <span class="font-medium">Laporan</span>
-                    @if (($role ?? 'admin') === 'staff')
+                    @if (auth()->check() && auth()->user()->role->name === 'staff')
                         <span class="ml-auto text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">View Only</span>
                     @endif
                 </a>
@@ -131,7 +131,7 @@
                 </a>
 
                 <!-- Company Profile (Admin Only) -->
-                @if (($role ?? 'admin') === 'admin')
+                @if (auth()->check() && auth()->user()->role->name === 'admin')
                     <a href="{{ route('company-profile.index') }}"
                         class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-primary hover:text-white transition-colors duration-300 {{ request()->routeIs('company-profile.*') ? 'bg-primary text-white' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,11 +176,13 @@
         <div class="border-t border-gray-200 p-4">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                    {{ strtoupper(substr($username ?? 'A', 0, 1)) }}
+                    {{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'A' }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate">{{ $username ?? 'Admin' }}</p>
-                    <p class="text-xs text-gray-500">{{ ucfirst($role ?? 'admin') }}</p>
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                        {{ auth()->check() ? auth()->user()->name : 'Admin' }}</p>
+                    <p class="text-xs text-gray-500">
+                        {{ auth()->check() ? ucfirst(auth()->user()->role->name) : 'Admin' }}</p>
                 </div>
                 <form action="{{ route('login') }}" method="GET">
                     <button type="submit" class="text-gray-400 hover:text-red-600 transition-colors duration-300"

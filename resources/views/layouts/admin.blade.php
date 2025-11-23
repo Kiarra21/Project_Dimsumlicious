@@ -153,6 +153,9 @@
     <div id="sidebarOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
         onclick="toggleSidebar()"></div>
 
+    <!-- Modal Container (outside flex container) -->
+    @stack('modals')
+
     <script>
         // Toggle Sidebar for Mobile
         function toggleSidebar() {

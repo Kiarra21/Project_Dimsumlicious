@@ -3,56 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Category;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
     /**
      * Display category management page
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Mock category data
-        $categories = [
-            [
-                'id' => 1,
-                'name' => 'Dimsum',
-                'description' => 'Berbagai varian dimsum kukus',
-                'product_count' => 15,
-                'status' => 'active'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Dimsum Goreng',
-                'description' => 'Dimsum dengan tekstur crispy',
-                'product_count' => 8,
-                'status' => 'active'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Pangsit',
-                'description' => 'Pangsit goreng dan kuah',
-                'product_count' => 6,
-                'status' => 'active'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Bakpao',
-                'description' => 'Bakpao dengan berbagai isian',
-                'product_count' => 10,
-                'status' => 'active'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Lumpia',
-                'description' => 'Lumpia basah dan goreng',
-                'product_count' => 6,
-                'status' => 'active'
-            ]
-        ];
-
-        $role = 'admin';
+        $search = $request->get('search');
         
-        return view('categories.index', compact( 'categories', 'role'));
+        $categories = Category::withCount('products')
+            ->when($search, function($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('description', 'like', "%{$search}%")
+                            ->orWhere('slug', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+        
+        return view('admin.categories.index', compact('categories'));
     }
 
     /**
@@ -60,8 +33,23 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: Implement category creation
-        return redirect()->route('categories.index', ['username' => $username])
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+        $validated['is_active'] = $request->has('is_active');
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        Category::create($validated);
+
+        return redirect()->route('categories.index')
                         ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
@@ -70,8 +58,29 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // TODO: Implement category update
-        return redirect()->route('categories.index', ['username' => $username])
+        $category = Category::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+        $validated['is_active'] = $request->has('is_active');
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($category->image) {
+                Storage::disk('public')->delete($category->image);
+            }
+            $validated['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        $category->update($validated);
+
+        return redirect()->route('categories.index')
                         ->with('success', 'Kategori berhasil diupdate!');
     }
 
@@ -80,8 +89,22 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        // TODO: Implement category deletion
-        return redirect()->route('categories.index', ['username' => $username])
+        $category = Category::findOrFail($id);
+        
+        // Check if category has products
+        if ($category->products()->count() > 0) {
+            return redirect()->route('categories.index')
+                            ->with('error', 'Kategori tidak bisa dihapus karena masih memiliki produk!');
+        }
+
+        // Delete image if exists
+        if ($category->image) {
+            Storage::disk('public')->delete($category->image);
+        }
+
+        $category->delete();
+
+        return redirect()->route('categories.index')
                         ->with('success', 'Kategori berhasil dihapus!');
     }
 }

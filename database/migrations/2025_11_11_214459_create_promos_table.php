@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title'); // Judul promosi (contoh: "Diskon 20% Akhir Pekan")
             $table->text('description'); // Deskripsi promosi
+            $table->integer('discount')->default(0); // Persentase diskon (0-100)
             $table->string('banner_image')->nullable(); // Path gambar banner promosi
             $table->date('start_date'); // Tanggal mulai promo
             $table->date('end_date'); // Tanggal akhir promo

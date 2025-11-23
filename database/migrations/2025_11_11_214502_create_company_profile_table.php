@@ -14,14 +14,20 @@ return new class extends Migration
         Schema::create('company_profile', function (Blueprint $table) {
             $table->id();
             $table->string('company_name')->default('Dimsumlicious'); // Nama perusahaan
-            $table->text('about_us'); // Deskripsi singkat tentang Dimsumlicious
+            $table->string('tagline')->nullable(); // Tagline perusahaan
+            $table->text('about_us')->nullable(); // Deskripsi singkat tentang Dimsumlicious
             $table->text('address'); // Alamat toko/lokasi
             $table->string('phone'); // Nomor telepon
-            $table->string('whatsapp'); // Nomor WhatsApp
+            $table->string('whatsapp')->nullable(); // Nomor WhatsApp
             $table->string('email')->nullable(); // Email
             $table->string('logo')->nullable(); // Logo perusahaan
             $table->string('hero_image')->nullable(); // Gambar hero di homepage
-            $table->text('social_media')->nullable(); // JSON untuk social media links (Instagram, Facebook, dll)
+            $table->string('operating_hours_weekdays')->nullable(); // Jam operasional weekdays
+            $table->string('operating_hours_weekend')->nullable(); // Jam operasional weekend
+            $table->string('instagram')->nullable(); // Instagram handle
+            $table->string('facebook')->nullable(); // Facebook page
+            $table->string('tiktok')->nullable(); // TikTok handle
+            $table->integer('founded_year')->nullable(); // Tahun berdiri
             $table->timestamps();
         });
     }

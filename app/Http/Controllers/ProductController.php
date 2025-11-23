@@ -3,118 +3,47 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Promo;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
     /**
      * Display product management page
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Mock product data
-        $dataList = [
-            [
-                'id' => 1,
-                'name' => 'Dimsum Ayam Isi 6',
-                'category' => 'Dimsum',
-                'price' => 15000,
-                'stock' => 25,
-                'status' => 'Available',
-                'last_restock' => '2024-01-20 10:30',
-                'image' => 'dimsum-ayam.jpg'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Dimsum Ayam Isi 8',
-                'category' => 'Dimsum',
-                'price' => 28000,
-                'stock' => 5,
-                'status' => 'Low Stock',
-                'last_restock' => '2024-01-19 09:15',
-                'image' => 'dimsum-ayam-isi-8.jpg'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Dimsum Goreng',
-                'category' => 'Dimsum Goreng',
-                'price' => 20000,
-                'stock' => 0,
-                'status' => 'Out of Stock',
-                'last_restock' => '2024-01-18 16:45',
-                'image' => 'dimsum-goreng.jpg'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Pangsit Kuah',
-                'category' => 'Pangsit',
-                'price' => 20000,
-                'stock' => 15,
-                'status' => 'Available',
-                'last_restock' => '2024-01-20 11:20',
-                'image' => 'pangsit-kuah.jpg'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Bakpao Ayam',
-                'category' => 'Bakpao',
-                'price' => 8000,
-                'stock' => 30,
-                'status' => 'Available',
-                'last_restock' => '2024-01-20 13:10',
-                'image' => 'bakpao-ayam.jpg'
-            ],
-            [
-                'id' => 6,
-                'name' => 'Bakpao Kacang Merah',
-                'category' => 'Bakpao',
-                'price' => 8000,
-                'stock' => 3,
-                'status' => 'Low Stock',
-                'last_restock' => '2024-01-19 12:05',
-                'image' => 'bakpao-kacang.jpg'
-            ],
-            [
-                'id' => 7,
-                'name' => 'Lumpia Semarang',
-                'category' => 'Lumpia',
-                'price' => 25000,
-                'stock' => 12,
-                'status' => 'Available',
-                'last_restock' => '2024-01-20 08:30',
-                'image' => 'lumpia-semarang.jpg'
-            ],
-            [
-                'id' => 8,
-                'name' => 'Lumpia Basah',
-                'category' => 'Lumpia',
-                'price' => 22000,
-                'stock' => 8,
-                'status' => 'Low Stock',
-                'last_restock' => '2024-01-19 14:20',
-                'image' => 'lumpia-basah.jpg'
-            ]
-        ];
+        $search = $request->get('search');
+        
+        $products = Product::with('category')
+            ->when($search, function($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('description', 'like', "%{$search}%")
+                            ->orWhereHas('category', function($q) use ($search) {
+                                $q->where('name', 'like', "%{$search}%");
+                            });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        $categories = Category::where('is_active', true)->get();
+        $promos = Promo::where('is_active', true)
+                      ->where('end_date', '>=', now())
+                      ->orderBy('title')
+                      ->get();
         
         // Management stats
-        $managementStats = [
-            'total_products' => count($dataList),
-            'available_products' => count(array_filter($dataList, fn($product) => $product['status'] === 'Available')),
-            'low_stock_products' => count(array_filter($dataList, fn($product) => $product['status'] === 'Low Stock')),
-            'out_of_stock' => count(array_filter($dataList, fn($product) => $product['status'] === 'Out of Stock'))
+        $stats = [
+            'total_products' => Product::count(),
+            'available_products' => Product::where('is_available', true)->count(),
+            'low_stock_products' => Product::where('stock', '>', 0)->where('stock', '<=', 5)->count(),
+            'out_of_stock' => Product::where('stock', 0)->count()
         ];
         
-        $role = 'admin';
-        
-        return view('pengelolaan', compact( 'dataList', 'managementStats', 'role'));
-    }
-
-    /**
-     * Show form to create new product
-     */
-    public function create()
-    {
-        $role = 'admin';
-        return view('products.create', compact( 'role'));
+        return view('admin.products.index', compact('products', 'categories', 'promos', 'stats'));
     }
 
     /**
@@ -122,19 +51,42 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: Implement product creation
-        return redirect()->route('products.index', ['username' => $username])
-                        ->with('success', 'Produk berhasil ditambahkan!');
-    }
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'promo_id' => 'nullable|exists:promos,id',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_available' => 'boolean',
+            'is_featured' => 'boolean',
+        ]);
 
-    /**
-     * Show form to edit product
-     */
-    public function edit($id)
-    {
-        // TODO: Get product from database
-        $role = 'admin';
-        return view('products.edit', compact( 'id', 'role'));
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $validated['slug'] = Str::slug($request->name);
+        $validated['is_available'] = $request->has('is_available');
+        $validated['is_featured'] = $request->has('is_featured');
+        
+        // Auto calculate discount
+        if ($request->promo_id) {
+            $promo = Promo::find($request->promo_id);
+            if ($promo && $promo->discount > 0) {
+                $validated['has_discount'] = true;
+                $validated['discount_price'] = $request->price - ($request->price * $promo->discount / 100);
+            }
+        } else {
+            $validated['has_discount'] = false;
+            $validated['discount_price'] = null;
+        }
+
+        Product::create($validated);
+
+        return redirect()->route('products.index')
+                        ->with('success', 'Produk berhasil ditambahkan!');
     }
 
     /**
@@ -142,8 +94,48 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // TODO: Implement product update
-        return redirect()->route('products.index', ['username' => $username])
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'promo_id' => 'nullable|exists:promos,id',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_available' => 'boolean',
+            'is_featured' => 'boolean',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $validated['slug'] = Str::slug($request->name);
+        $validated['is_available'] = $request->has('is_available');
+        $validated['is_featured'] = $request->has('is_featured');
+        
+        // Auto calculate discount
+        if ($request->promo_id) {
+            $promo = Promo::find($request->promo_id);
+            if ($promo && $promo->discount > 0) {
+                $validated['has_discount'] = true;
+                $validated['discount_price'] = $request->price - ($request->price * $promo->discount / 100);
+            }
+        } else {
+            $validated['has_discount'] = false;
+            $validated['discount_price'] = null;
+            $validated['promo_id'] = null;
+        }
+
+        $product->update($validated);
+
+        return redirect()->route('products.index')
                         ->with('success', 'Produk berhasil diupdate!');
     }
 
@@ -152,8 +144,16 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        // TODO: Implement product deletion
-        return redirect()->route('products.index', ['username' => $username])
+        $product = Product::findOrFail($id);
+        
+        // Delete image if exists
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
+
+        return redirect()->route('products.index')
                         ->with('success', 'Produk berhasil dihapus!');
     }
 }

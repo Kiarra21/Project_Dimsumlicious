@@ -10,6 +10,7 @@ class CompanyProfile extends Model
 
     protected $fillable = [
         'company_name',
+        'tagline',
         'about_us',
         'address',
         'phone',
@@ -17,11 +18,12 @@ class CompanyProfile extends Model
         'email',
         'logo',
         'hero_image',
-        'social_media',
-    ];
-
-    protected $casts = [
-        'social_media' => 'array', // Cast JSON ke array
+        'operating_hours_weekdays',
+        'operating_hours_weekend',
+        'instagram',
+        'facebook',
+        'tiktok',
+        'founded_year',
     ];
 
     /**

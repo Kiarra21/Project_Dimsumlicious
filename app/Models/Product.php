@@ -14,6 +14,9 @@ class Product extends Model
         'slug',
         'description',
         'price',
+        'promo_id',
+        'has_discount',
+        'discount_price',
         'stock',
         'image',
         'is_available',
@@ -22,6 +25,8 @@ class Product extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'discount_price' => 'decimal:2',
+        'has_discount' => 'boolean',
         'is_available' => 'boolean',
         'is_featured' => 'boolean',
     ];
@@ -32,6 +37,14 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Relasi: Produk belongs to Promo
+     */
+    public function promo(): BelongsTo
+    {
+        return $this->belongsTo(Promo::class);
     }
 
     /**
@@ -48,5 +61,13 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Get harga akhir (pakai discount_price kalau has_discount=true)
+     */
+    public function getFinalPrice()
+    {
+        return $this->has_discount && $this->discount_price ? $this->discount_price : $this->price;
     }
 }

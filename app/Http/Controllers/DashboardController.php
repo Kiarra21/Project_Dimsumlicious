@@ -14,6 +14,10 @@ class DashboardController extends Controller
         // Get current authenticated user
         $user = auth()->user();
         
+        // Get role and username from authenticated user
+        $role = $user->role->name; // 'admin' or 'staff'
+        $username = $user->name;
+        
         // Mock data - nanti diganti dengan data dari database
         $stats = [
             'total_products' => 45,
@@ -67,10 +71,13 @@ class DashboardController extends Controller
             ]
         ];
         
-        // Get role and username from authenticated user
-        $role = $user->role->name; // 'admin' or 'staff'
-        $username = $user->name;
+        // Return different views based on role
+        if ($role === 'staff') {
+            // Staff dashboard - limited access, no sensitive admin data
+            return view('dashboard-staff', compact('username', 'stats', 'chartData', 'recentActivities', 'role'));
+        }
         
+        // Admin dashboard - full access
         return view('dashboard', compact('username', 'stats', 'chartData', 'recentActivities', 'role'));
     }
 }

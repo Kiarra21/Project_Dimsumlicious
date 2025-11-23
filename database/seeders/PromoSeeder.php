@@ -21,6 +21,7 @@ class PromoSeeder extends Seeder
             [
                 'title' => 'Diskon 20% Weekend Spesial',
                 'description' => 'Dapatkan diskon 20% untuk semua jenis dimsum setiap akhir pekan! Promo berlaku untuk pembelian minimal 10 pcs.',
+                'discount' => 20,
                 'start_date' => Carbon::now()->startOfWeek(),
                 'end_date' => Carbon::now()->endOfMonth(),
                 'is_active' => true,
@@ -29,6 +30,7 @@ class PromoSeeder extends Seeder
             [
                 'title' => 'Beli 2 Gratis 1 Paket Ramadhan',
                 'description' => 'Spesial bulan Ramadhan! Beli 2 paket hemat gratis 1 paket reguler. Buruan pesan sebelum kehabisan!',
+                'discount' => 0,
                 'start_date' => Carbon::now(),
                 'end_date' => Carbon::now()->addMonths(2),
                 'is_active' => true,
@@ -37,6 +39,7 @@ class PromoSeeder extends Seeder
             [
                 'title' => 'Grand Opening Diskon 50%',
                 'description' => 'Perayaan Grand Opening! Diskon hingga 50% untuk semua produk. Kesempatan terbatas!',
+                'discount' => 50,
                 'start_date' => Carbon::now()->subDays(7),
                 'end_date' => Carbon::now()->addDays(7),
                 'is_active' => true,

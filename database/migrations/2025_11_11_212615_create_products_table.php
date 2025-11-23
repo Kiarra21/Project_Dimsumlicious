@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('slug')->unique(); // URL-friendly name
             $table->text('description')->nullable(); // Deskripsi produk
             $table->decimal('price', 10, 2); // Harga produk (contoh: 25000.00)
+            $table->unsignedBigInteger('promo_id')->nullable(); // ID promosi (nullable, tanpa constraint dulu)
+            $table->boolean('has_discount')->default(false); // Status ada diskon atau tidak
+            $table->decimal('discount_price', 10, 2)->nullable(); // Harga setelah diskon
             $table->integer('stock')->default(0); // Stok produk
             $table->string('image')->nullable(); // Gambar produk
             $table->boolean('is_available')->default(true); // Status ketersediaan

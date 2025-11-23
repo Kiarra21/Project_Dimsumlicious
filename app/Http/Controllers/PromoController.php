@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Promo;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class PromoController extends Controller
 {
@@ -11,43 +14,24 @@ class PromoController extends Controller
      */
     public function index()
     {
-        // Mock promo data
-        $promos = [
-            [
-                'id' => 1,
-                'title' => 'Diskon 20% Paket Hemat',
-                'description' => 'Beli 3 paket dimsum, hemat 20%',
-                'discount' => 20,
-                'start_date' => '2024-01-01',
-                'end_date' => '2024-01-31',
-                'status' => 'active',
-                'image' => 'promo1.jpg'
-            ],
-            [
-                'id' => 2,
-                'title' => 'Gratis Delivery',
-                'description' => 'Gratis ongkir untuk pembelian min. Rp 100.000',
-                'discount' => 0,
-                'start_date' => '2024-01-15',
-                'end_date' => '2024-02-15',
-                'status' => 'active',
-                'image' => 'promo2.jpg'
-            ],
-            [
-                'id' => 3,
-                'title' => 'Buy 1 Get 1',
-                'description' => 'Beli 1 Lumpia dapat 1 gratis',
-                'discount' => 50,
-                'start_date' => '2024-01-10',
-                'end_date' => '2024-01-20',
-                'status' => 'expired',
-                'image' => 'promo3.jpg'
-            ]
-        ];
-
-        $role = 'admin';
+        $promos = Promo::with('creator')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($promo) {
+                return [
+                    'id' => $promo->id,
+                    'title' => $promo->title,
+                    'description' => $promo->description,
+                    'discount' => $promo->discount ?? 0,
+                    'start_date' => $promo->start_date->format('Y-m-d'),
+                    'end_date' => $promo->end_date->format('Y-m-d'),
+                    'status' => $promo->isValid() ? 'active' : 'expired',
+                    'image' => $promo->banner_image,
+                    'is_active' => $promo->is_active
+                ];
+            })->toArray();
         
-        return view('promos.index', compact( 'promos', 'role'));
+        return view('admin.promos.index', compact('promos'));
     }
 
     /**
@@ -55,8 +39,26 @@ class PromoController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO: Implement promo creation
-        return redirect()->route('promos.index', ['username' => $username])
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'discount' => 'nullable|integer|min:0|max:100',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'banner_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+        $validated['created_by'] = auth()->id();
+
+        if ($request->hasFile('banner_image')) {
+            $validated['banner_image'] = $request->file('banner_image')->store('promos', 'public');
+        }
+
+        Promo::create($validated);
+        
+        return redirect()->route('promos.index')
                         ->with('success', 'Promo berhasil ditambahkan!');
     }
 
@@ -65,8 +67,31 @@ class PromoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // TODO: Implement promo update
-        return redirect()->route('promos.index', ['username' => $username])
+        $promo = Promo::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'discount' => 'nullable|integer|min:0|max:100',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'banner_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_active' => 'boolean',
+        ]);
+
+        $validated['is_active'] = $request->has('is_active');
+
+        if ($request->hasFile('banner_image')) {
+            // Delete old image
+            if ($promo->banner_image) {
+                Storage::disk('public')->delete($promo->banner_image);
+            }
+            $validated['banner_image'] = $request->file('banner_image')->store('promos', 'public');
+        }
+
+        $promo->update($validated);
+        
+        return redirect()->route('promos.index')
                         ->with('success', 'Promo berhasil diupdate!');
     }
 
@@ -75,8 +100,16 @@ class PromoController extends Controller
      */
     public function destroy($id)
     {
-        // TODO: Implement promo deletion
-        return redirect()->route('promos.index', ['username' => $username])
+        $promo = Promo::findOrFail($id);
+        
+        // Delete image if exists
+        if ($promo->banner_image) {
+            Storage::disk('public')->delete($promo->banner_image);
+        }
+
+        $promo->delete();
+        
+        return redirect()->route('promos.index')
                         ->with('success', 'Promo berhasil dihapus!');
     }
 }
