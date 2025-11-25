@@ -195,17 +195,6 @@
 
                             <!-- Konten Promo -->
                             <div class="p-6 bg-gradient-to-br from-[#72BF78] to-[#A0D683] text-white">
-                                <div class="flex items-center justify-between mb-3">
-                                    <span class="px-3 py-1 bg-white/30 backdrop-blur-sm rounded-full text-xs font-bold">
-                                        Promo
-                                    </span>
-                                    @if ($promo->discount_type === 'percentage')
-                                        <div class="text-4xl font-bold drop-shadow-lg">{{ $promo->discount_value }}%</div>
-                                    @else
-                                        <div class="text-2xl font-bold drop-shadow-lg">-Rp
-                                            {{ number_format($promo->discount_value, 0, ',', '.') }}</div>
-                                    @endif
-                                </div>
                                 <h3 class="text-2xl font-bold mb-2 drop-shadow">{{ $promo->title }}</h3>
                                 <p class="text-base mb-3 drop-shadow">{{ Str::limit($promo->description, 80) }}</p>
                                 <p class="text-xs font-semibold bg-white/20 inline-block px-3 py-1 rounded-full">
