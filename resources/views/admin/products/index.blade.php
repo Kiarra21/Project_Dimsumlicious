@@ -393,7 +393,7 @@
 
             function openEditModal(product) {
                 document.getElementById('modalTitle').textContent = 'Edit Produk';
-                document.getElementById('productForm').action = '/products/' + product.id;
+                document.getElementById('productForm').action = '/admin/products/' + product.id;
                 document.getElementById('methodField').innerHTML = '@method('PUT')';
 
                 // Fill form
@@ -426,7 +426,7 @@
                 if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = '/products/' + id;
+                    form.action = '/admin/products/' + id;
                     form.innerHTML = '@csrf @method('DELETE')';
                     document.body.appendChild(form);
                     form.submit();

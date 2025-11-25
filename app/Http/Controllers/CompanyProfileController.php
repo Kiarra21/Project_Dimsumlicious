@@ -36,7 +36,9 @@ class CompanyProfileController extends Controller
             ],
             'founded_year' => $profile->founded_year ?? 2019,
             'logo' => $profile->logo,
-            'hero_image' => $profile->hero_image
+            'hero_image' => $profile->hero_image,
+            'last_updated_by' => $profile->updater ? $profile->updater->name : null,
+            'last_updated_at' => $profile->updated_at
         ];
 
         return view('admin.company-profile.index', compact('companyData'));
@@ -102,6 +104,7 @@ class CompanyProfileController extends Controller
         $profile->instagram = $validated['instagram'] ?? null;
         $profile->facebook = $validated['facebook'] ?? null;
         $profile->tiktok = $validated['tiktok'] ?? null;
+        $profile->updated_by = auth()->id(); // Track siapa yang edit
         $profile->save();
         
         return redirect()->route('company-profile.index')

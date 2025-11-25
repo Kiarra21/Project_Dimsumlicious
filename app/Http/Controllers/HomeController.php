@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Promo;
+use App\Models\CompanyProfile;
 
 class HomeController extends Controller
 {
@@ -11,68 +14,56 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Data untuk homepage
-        $featuredProducts = [
-            [
-                'id' => 1,
-                'name' => 'Dimsum Ayam Original',
-                'price' => 15000,
-                'image' => 'dimsum-ayam.jpg',
-                'category' => 'Dimsum',
-                'rating' => 4.8
-            ],
-            [
-                'id' => 2,
-                'name' => 'Pangsit Kuah Spesial',
-                'price' => 20000,
-                'image' => 'pangsit-kuah.jpg',
-                'category' => 'Pangsit',
-                'rating' => 4.9
-            ],
-            [
-                'id' => 3,
-                'name' => 'Lumpia Semarang',
-                'price' => 25000,
-                'image' => 'lumpia.jpg',
-                'category' => 'Lumpia',
-                'rating' => 4.7
-            ]
-        ];
+        // Ambil 3 produk unggulan (featured/terpopuler)
+        $featuredProducts = Product::where('is_available', true)
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+
+        // Ambil 3 promo terbaru
+        $latestPromos = Promo::where('is_active', true)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
 
         $stats = [
-            'total_products' => 45,
+            'total_products' => Product::where('is_available', true)->count(),
             'happy_customers' => 1250,
             'years_experience' => 5,
             'daily_orders' => 150
         ];
 
-        return view('home', compact('featuredProducts', 'stats'));
+        return view('home', compact('featuredProducts', 'latestPromos', 'stats'));
     }
 
     /**
      * Display product catalog
      */
-    public function products()
+    public function products(Request $request)
     {
-        // Nanti akan ambil dari database
-        $products = [];
-        return view('products', compact('products'));
+        $query = Product::where('is_available', true)->with('category');
+
+        // Filter by category if provided
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category_id', $request->category);
+        }
+
+        $products = $query->orderBy('created_at', 'desc')->paginate(12);
+
+        $categories = \App\Models\Category::all();
+
+        return view('user.products', compact('products', 'categories'));
     }
 
     /**
-     * Display about page
+     * Display about & contact page (combined)
      */
     public function about()
     {
-        return view('about');
-    }
-
-    /**
-     * Display contact page
-     */
-    public function contact()
-    {
-        return view('contact');
+        $companyProfile = CompanyProfile::first();
+        return view('user.about', compact('companyProfile'));
     }
 
     /**
@@ -80,6 +71,12 @@ class HomeController extends Controller
      */
     public function promo()
     {
-        return view('promo');
+        $promos = Promo::where('is_active', true)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('created_at', 'desc')
+            ->paginate(6);
+
+        return view('user.promo', compact('promos'));
     }
 }

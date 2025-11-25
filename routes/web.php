@@ -22,11 +22,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Product catalog for users
 Route::get('/products', [HomeController::class, 'products'])->name('user.products');
 
-// About page
+// About & Contact page (combined)
 Route::get('/about', [HomeController::class, 'about'])->name('user.about');
-
-// Contact page
-Route::get('/contact', [HomeController::class, 'contact'])->name('user.contact');
 
 // Promo page for users
 Route::get('/promo', [HomeController::class, 'promo'])->name('user.promo');
@@ -85,7 +82,7 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
 });
 
 // Product Management (Admin & Staff with permissions)
-Route::prefix('products')->middleware(['auth', 'role:admin,staff'])->name('products.')->group(function () {
+Route::prefix('admin/products')->middleware(['auth', 'role:admin,staff'])->name('products.')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->name('index');
     Route::get('/create', [ProductController::class, 'create'])->name('create');
     Route::post('/', [ProductController::class, 'store'])->name('store');
@@ -134,8 +131,8 @@ Route::prefix('staff')->middleware(['auth', 'role:admin'])->name('staff.')->grou
     Route::delete('/{id}', [StaffController::class, 'destroy'])->name('destroy');
 });
 
-// Reports (Admin has full access, Staff has limited)
-Route::prefix('reports')->middleware(['auth', 'role:admin,staff'])->name('reports.')->group(function () {
+// Reports (Admin Only)
+Route::prefix('reports')->middleware(['auth', 'role:admin'])->name('reports.')->group(function () {
     Route::get('/', [ReportController::class, 'index'])->name('index');
     Route::post('/sales', [ReportController::class, 'generateSales'])->name('sales');
     Route::post('/stock', [ReportController::class, 'generateStock'])->name('stock');

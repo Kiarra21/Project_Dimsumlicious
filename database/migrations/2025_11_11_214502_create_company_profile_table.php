@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('facebook')->nullable(); // Facebook page
             $table->string('tiktok')->nullable(); // TikTok handle
             $table->integer('founded_year')->nullable(); // Tahun berdiri
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null'); // Admin yang terakhir edit
             $table->timestamps();
         });
     }

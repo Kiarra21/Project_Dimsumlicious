@@ -44,6 +44,17 @@
                         <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total_products']) }}</p>
                     </div>
                 </div>
+                <div class="mt-4">
+                    @if ($stats['product_growth'] > 0)
+                        <span class="text-green-600 text-sm font-medium">+{{ number_format($stats['product_growth'], 1) }}%
+                            dari bulan lalu</span>
+                    @elseif($stats['product_growth'] < 0)
+                        <span class="text-red-600 text-sm font-medium">{{ number_format($stats['product_growth'], 1) }}%
+                            dari bulan lalu</span>
+                    @else
+                        <span class="text-gray-600 text-sm font-medium">Tidak ada perubahan</span>
+                    @endif
+                </div>
             </div>
 
             <!-- Low Stock Warning -->
@@ -62,6 +73,16 @@
                         <p class="text-2xl font-bold text-gray-900">{{ $stats['low_stock'] }}</p>
                     </div>
                 </div>
+                <div class="mt-4">
+                    @if ($stats['low_stock_change'] > 0)
+                        <span class="text-red-600 text-sm font-medium">+{{ $stats['low_stock_change'] }} dari kemarin</span>
+                    @elseif($stats['low_stock_change'] < 0)
+                        <span class="text-green-600 text-sm font-medium">{{ $stats['low_stock_change'] }} dari
+                            kemarin</span>
+                    @else
+                        <span class="text-gray-600 text-sm font-medium">Tidak ada perubahan</span>
+                    @endif
+                </div>
             </div>
 
             <!-- Total Orders -->
@@ -79,6 +100,17 @@
                         <p class="text-sm font-medium text-gray-500">Total Pesanan</p>
                         <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total_sales']) }}</p>
                     </div>
+                </div>
+                <div class="mt-4">
+                    @if ($stats['sales_growth'] > 0)
+                        <span class="text-green-600 text-sm font-medium">+{{ number_format($stats['sales_growth'], 1) }}%
+                            dari bulan lalu</span>
+                    @elseif($stats['sales_growth'] < 0)
+                        <span class="text-red-600 text-sm font-medium">{{ number_format($stats['sales_growth'], 1) }}% dari
+                            bulan lalu</span>
+                    @else
+                        <span class="text-gray-600 text-sm font-medium">Tidak ada perubahan</span>
+                    @endif
                 </div>
             </div>
         </div>

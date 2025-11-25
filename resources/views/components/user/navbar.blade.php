@@ -18,20 +18,21 @@
 
             <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
+                <a href="{{ route('home') }}"
+                    class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
                     Beranda
                 </a>
-                <a href="#produk" class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
+                <a href="{{ route('user.products') }}"
+                    class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
                     Produk
                 </a>
-                <a href="#promo" class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
+                <a href="{{ route('user.promo') }}"
+                    class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
                     Promo
                 </a>
-                <a href="#tentang" class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
-                    Tentang Kami
-                </a>
-                <a href="#kontak" class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
-                    Kontak
+                <a href="{{ route('user.about') }}"
+                    class="text-gray-700 hover:text-primary font-medium transition-colors duration-300">
+                    Tentang & Kontak
                 </a>
             </div>
 
@@ -57,7 +58,8 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
-                            <form action="{{ route('login') }}" method="GET" class="inline">
+                            <form action="{{ route('logout') }}" method="POST" class="inline">
+                                @csrf
                                 <button type="submit" class="text-xs text-red-600 hover:text-red-700">Logout</button>
                             </form>
                         </div>
@@ -88,25 +90,21 @@
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200">
         <div class="px-4 py-4 space-y-3">
-            <a href="#"
+            <a href="{{ route('home') }}"
                 class="block px-4 py-2 text-gray-700 hover:bg-primary hover:text-white rounded-lg transition-colors duration-300">
                 Beranda
             </a>
-            <a href="#produk"
+            <a href="{{ route('user.products') }}"
                 class="block px-4 py-2 text-gray-700 hover:bg-primary hover:text-white rounded-lg transition-colors duration-300">
                 Produk
             </a>
-            <a href="#promo"
+            <a href="{{ route('user.promo') }}"
                 class="block px-4 py-2 text-gray-700 hover:bg-primary hover:text-white rounded-lg transition-colors duration-300">
                 Promo
             </a>
-            <a href="#tentang"
+            <a href="{{ route('user.about') }}"
                 class="block px-4 py-2 text-gray-700 hover:bg-primary hover:text-white rounded-lg transition-colors duration-300">
-                Tentang Kami
-            </a>
-            <a href="#kontak"
-                class="block px-4 py-2 text-gray-700 hover:bg-primary hover:text-white rounded-lg transition-colors duration-300">
-                Kontak
+                Tentang & Kontak
             </a>
 
             @auth
@@ -118,7 +116,8 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
-                            <form action="{{ route('login') }}" method="GET" class="inline">
+                            <form action="{{ route('logout') }}" method="POST" class="inline">
+                                @csrf
                                 <button type="submit" class="text-xs text-red-600 hover:text-red-700">Logout</button>
                             </form>
                         </div>

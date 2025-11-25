@@ -10,6 +10,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    @stack('styles')
+
     <style>
         :root {
             --primary: #72BF78;
@@ -203,6 +205,8 @@
             });
         });
     </script>
+
+    @stack('scripts')
 </body>
 
 </html>

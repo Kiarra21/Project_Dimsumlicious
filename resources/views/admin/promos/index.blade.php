@@ -91,7 +91,19 @@
             @forelse($promos as $promo)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                     <!-- Promo Image -->
-                    <div class="relative h-48 bg-gradient-to-br from-primary to-secondary">
+                    <div class="relative h-48 bg-gradient-to-br from-primary to-secondary overflow-hidden">
+                        @if ($promo['image'])
+                            <img src="{{ asset('storage/' . $promo['image']) }}" alt="{{ $promo['title'] }}"
+                                class="w-full h-full object-cover">
+                        @else
+                            <div class="flex items-center justify-center h-full">
+                                <svg class="w-20 h-20 text-white opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        @endif
                         <div class="absolute top-3 right-3">
                             @if ($promo['status'] === 'active')
                                 <span
@@ -100,13 +112,6 @@
                                 <span
                                     class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-500 text-white">Kadaluarsa</span>
                             @endif
-                        </div>
-                        <div class="flex items-center justify-center h-full">
-                            <svg class="w-20 h-20 text-white opacity-50" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
-                                    clip-rule="evenodd" />
-                            </svg>
                         </div>
                         @if ($promo['discount'] > 0)
                             <div class="absolute bottom-3 left-3">

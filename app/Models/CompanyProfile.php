@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CompanyProfile extends Model
 {
@@ -24,7 +25,16 @@ class CompanyProfile extends Model
         'facebook',
         'tiktok',
         'founded_year',
+        'updated_by',
     ];
+
+    /**
+     * Relasi: Company profile di-update oleh User (Admin)
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
 
     /**
      * Get company profile singleton
