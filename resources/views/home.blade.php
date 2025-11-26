@@ -127,13 +127,11 @@
                                     {{ number_format($product->price, 0, ',', '.') }}</span>
                                 @auth
                                     @if (auth()->user()->role->name === 'user' && $product->stock > 0)
-                                        <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit"
-                                                class="px-6 py-3 bg-[#72BF78] text-white rounded-lg hover:bg-[#A0D683] transition-colors duration-300 font-bold shadow-lg hover:shadow-xl">
-                                                Pesan
-                                            </button>
-                                        </form>
+                                        <button
+                                            onclick="openQtyModal({{ $product->id }}, '{{ $product->name }}', {{ $product->stock }})"
+                                            class="px-6 py-3 bg-[#72BF78] text-white rounded-lg hover:bg-[#A0D683] transition-colors duration-300 font-bold shadow-lg hover:shadow-xl">
+                                            Pesan
+                                        </button>
                                     @endif
                                 @else
                                     <a href="{{ route('login') }}"
@@ -222,4 +220,84 @@
             </div>
         </div>
     </section>
+
+    <!-- Quantity Modal -->
+    <div id="qtyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Masukkan Jumlah</h3>
+            <p id="modalProductName" class="text-gray-600 mb-4"></p>
+
+            <form id="addToCartForm" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah</label>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="decrementQty()"
+                            class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center justify-center font-bold">
+                            -
+                        </button>
+                        <input type="number" name="quantity" id="qtyInput" value="1" min="1"
+                            class="w-20 text-center border border-gray-300 rounded-lg py-2 font-semibold">
+                        <button type="button" onclick="incrementQty()"
+                            class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center justify-center font-bold">
+                            +
+                        </button>
+                    </div>
+                    <p id="stockInfo" class="text-xs text-gray-500 mt-1"></p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeQtyModal()"
+                        class="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="flex-1 px-4 py-2 bg-[#72BF78] text-white rounded-lg hover:bg-[#A0D683] font-semibold">
+                        Tambah ke Keranjang
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentStock = 1;
+
+        function openQtyModal(productId, productName, stock) {
+            currentStock = stock;
+            document.getElementById('qtyModal').classList.remove('hidden');
+            document.getElementById('modalProductName').textContent = productName;
+            document.getElementById('stockInfo').textContent = `Stok tersedia: ${stock}`;
+            document.getElementById('qtyInput').value = 1;
+            document.getElementById('qtyInput').max = stock;
+            document.getElementById('addToCartForm').action = `/cart/add/${productId}`;
+        }
+
+        function closeQtyModal() {
+            document.getElementById('qtyModal').classList.add('hidden');
+        }
+
+        function incrementQty() {
+            const input = document.getElementById('qtyInput');
+            const currentVal = parseInt(input.value);
+            if (currentVal < currentStock) {
+                input.value = currentVal + 1;
+            }
+        }
+
+        function decrementQty() {
+            const input = document.getElementById('qtyInput');
+            const currentVal = parseInt(input.value);
+            if (currentVal > 1) {
+                input.value = currentVal - 1;
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('qtyModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeQtyModal();
+            }
+        });
+    </script>
 @endsection

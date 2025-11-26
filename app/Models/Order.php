@@ -14,11 +14,8 @@ class Order extends Model
         'user_id',
         'status',
         'subtotal',
-        'tax',
-        'delivery_fee',
         'total',
         'customer_notes',
-        'delivery_address',
         'phone_number',
         'rejection_reason',
         'rejected_at',
@@ -27,8 +24,6 @@ class Order extends Model
 
     protected $casts = [
         'subtotal' => 'decimal:2',
-        'tax' => 'decimal:2',
-        'delivery_fee' => 'decimal:2',
         'total' => 'decimal:2',
         'rejected_at' => 'datetime',
         'completed_at' => 'datetime',

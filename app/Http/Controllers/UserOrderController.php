@@ -66,9 +66,13 @@ class UserOrderController extends Controller
         // Update payment
         $payment->proof_image = $path;
         $payment->status = 'pending';
-        $payment->rejection_reason = null;
-        $payment->rejected_at = null;
+
+        // Reset rejection data on ORDER (because user uploads new proof)
+        $order->rejection_reason = null;
+        $order->rejected_at = null;
+
         $payment->save();
+        $order->save();
 
         return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload! Menunggu verifikasi.');
     }

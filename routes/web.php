@@ -13,20 +13,20 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompanyProfileController;
 
 // ============================================
-// PUBLIC ROUTES (Guest/User)
+// PUBLIC ROUTES - Wajib Login (No Guest Access)
 // ============================================
 
 // Homepage
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->middleware('auth')->name('home');
 
 // Product catalog for users
-Route::get('/products', [HomeController::class, 'products'])->name('user.products');
+Route::get('/products', [HomeController::class, 'products'])->middleware('auth')->name('user.products');
 
 // About & Contact page (combined)
-Route::get('/about', [HomeController::class, 'about'])->name('user.about');
+Route::get('/about', [HomeController::class, 'about'])->middleware('auth')->name('user.about');
 
 // Promo page for users
-Route::get('/promo', [HomeController::class, 'promo'])->name('user.promo');
+Route::get('/promo', [HomeController::class, 'promo'])->middleware('auth')->name('user.promo');
 
 
 // ============================================
@@ -41,6 +41,22 @@ Route::prefix('cart')->middleware(['auth', 'role:user'])->name('cart.')->group(f
     Route::delete('/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('remove');
     Route::delete('/', [App\Http\Controllers\CartController::class, 'clear'])->name('clear');
 });
+
+// Halaman upload pembayaran
+Route::get('/orders/{id}/payment', [
+App\Http\Controllers\UserOrderController::class,
+'paymentPage'
+])->name('user.orders.payment');
+
+// Proses upload bukti pembayaran
+Route::post('/orders/{id}/payment', [
+App\Http\Controllers\UserOrderController::class,
+'uploadPayment'
+])->name('user.orders.upload-payment');
+
+Route::post('/checkout/upload-payment', [App\Http\Controllers\CheckoutController::class, 'uploadPayment'])
+->middleware(['auth', 'role:user'])
+->name('checkout.upload-payment');
 
 // Checkout & Orders
 Route::middleware(['auth', 'role:user'])->group(function () {

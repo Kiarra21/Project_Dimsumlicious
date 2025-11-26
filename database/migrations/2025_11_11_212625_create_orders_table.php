@@ -21,13 +21,10 @@ return new class extends Migration
                   ->default('pending_payment');
             
             $table->decimal('subtotal', 12, 2); // Total harga item (sebelum ongkir, pajak, dll)
-            $table->decimal('tax', 10, 2)->default(0); // Pajak (jika ada)
-            $table->decimal('delivery_fee', 10, 2)->default(0); // Ongkir (jika ada)
             $table->decimal('total', 12, 2); // Total keseluruhan
             
             // Informasi pengiriman/catatan
             $table->text('customer_notes')->nullable(); // Catatan dari customer
-            $table->string('delivery_address')->nullable(); // Alamat pengiriman (jika perlu)
             $table->string('phone_number'); // Nomor HP untuk konfirmasi
             
             // Rejection info (jika ditolak)

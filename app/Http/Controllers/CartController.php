@@ -61,6 +61,7 @@ class CartController extends Controller
                 'user_id' => auth()->id(),
                 'product_id' => $productId,
                 'quantity' => $quantity,
+                'price' => $product->price,
             ]);
         }
 

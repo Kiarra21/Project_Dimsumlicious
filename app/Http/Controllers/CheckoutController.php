@@ -21,14 +21,19 @@ class CheckoutController extends Controller
             ->get();
 
         if ($carts->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
+            return redirect()->route('cart.index')
+                ->with('error', 'Keranjang kosong!');
         }
 
         $subtotal = $carts->sum(fn($cart) => $cart->subtotal);
-        $tax = $subtotal * 0.10; // 10% tax
-        $total = $subtotal + $tax;
 
-        return view('user.checkout.index', compact('carts', 'subtotal', 'tax', 'total'));
+        $total = $subtotal; // tanpa tax
+
+        return view('user.checkout.index', compact(
+            'carts',
+            'subtotal',
+            'total'
+        ));
     }
 
     /**
@@ -36,8 +41,9 @@ class CheckoutController extends Controller
      */
     public function process(Request $request)
     {
+        
+        // HANYA catatan opsional
         $request->validate([
-            'delivery_address' => 'required|string|max:500',
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -46,63 +52,65 @@ class CheckoutController extends Controller
             ->get();
 
         if ($carts->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
+            return redirect()->route('cart.index')
+                ->with('error', 'Keranjang kosong!');
         }
 
         DB::beginTransaction();
 
         try {
-            // Calculate totals
+            // Hitung total
             $subtotal = $carts->sum(fn($cart) => $cart->subtotal);
-            $tax = $subtotal * 0.10;
-            $total = $subtotal + $tax;
+            $total = $subtotal;
 
-            // Create order
+            // Buat order (tanpa address, tanpa tax, tanpa notes)
             $order = Order::create([
-                'user_id' => auth()->id(),
-                'order_number' => Order::generateOrderNumber(),
-                'status' => 'pending_payment',
-                'subtotal' => $subtotal,
-                'tax' => $tax,
-                'total' => $total,
-                'delivery_address' => $request->delivery_address,
-                'notes' => $request->notes,
+                'user_id'        => auth()->id(),
+                'order_number'   => Order::generateOrderNumber(),
+                'status'         => 'pending_payment',
+                'subtotal'       => $subtotal,
+                'total'          => $total,
+                'phone_number'   => auth()->user()->phone ?? null,
             ]);
 
-            // Create order items
+            // Simpan item pesanan
             foreach ($carts as $cart) {
                 OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $cart->product_id,
-                    'product_name' => $cart->product->name,
-                    'product_price' => $cart->product->price,
-                    'quantity' => $cart->quantity,
-                    'subtotal' => $cart->subtotal,
+                    'order_id'      => $order->id,
+                    'product_id'    => $cart->product_id,
+                    'product_name'  => $cart->product->name,
+                    'price' => $cart->product->price,
+                    'quantity'      => $cart->quantity,
+                    'subtotal'      => $cart->subtotal,
                 ]);
 
-                // Reduce stock
+                // Kurangi stok
                 $cart->product->decrement('stock', $cart->quantity);
             }
 
-            // Create payment record
+            // Buat pembayaran
             Payment::create([
-                'order_id' => $order->id,
-                'amount' => $total,
+                'order_id'       => $order->id,
+                'amount'         => $total,
                 'payment_method' => 'qris',
-                'status' => 'pending',
+                'status'         => 'pending',
             ]);
 
-            // Clear cart
+            // Hapus cart user
             Cart::where('user_id', auth()->id())->delete();
 
             DB::commit();
-
+            
             return redirect()->route('user.orders.show', $order->id)
                 ->with('success', 'Pesanan berhasil dibuat! Silakan upload bukti pembayaran.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            
+        
+            // dd($e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }
