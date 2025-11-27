@@ -23,13 +23,13 @@
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <div class="text-center">
                             <div class="w-24 h-24 mx-auto mb-4">
-                                @if (auth()->user()->avatar)
+                                @if ($user->avatar)
                                     <img src="{{ asset('storage/avatar/' . auth()->user()->avatar) }}"
-                                        class="w-10 h-10 rounded-full object-cover">
+                                        class="w-24 h-24 rounded-full object-cover mx-auto shadow">
                                 @else
                                     <div
-                                        class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                                        class="w-24 h-24 bg-primary rounded-full flex items-center justify-center text-white font-bold text-3xl">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
                                     </div>
                                 @endif
                             </div>
