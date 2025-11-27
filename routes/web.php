@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompanyProfileController;
+use App\Http\Controllers\UserProfileController;
 
 // ============================================
 // PUBLIC ROUTES - Wajib Login (No Guest Access)
@@ -52,7 +53,14 @@ Route::prefix('cart')
         Route::delete('/', [App\Http\Controllers\CartController::class, 'clear'])->name('clear');
     });
 
-
+Route::prefix('user/profile')
+    ->middleware(['auth', 'role:user'])
+    ->name('user.profile.')
+    ->group(function () {
+        Route::get('/', [UserProfileController::class, 'show'])->name('show');
+        Route::put('/', [UserProfileController::class, 'update'])->name('update');
+        Route::put('/password', [UserProfileController::class, 'updatePassword'])->name('password');
+    });
 
 // Route::post('/checkout/upload-payment', [App\Http\Controllers\CheckoutController::class, 'uploadPayment'])
 //     ->middleware(['auth', 'role:user'])
@@ -146,7 +154,6 @@ Route::prefix('payments')
         Route::post('/{id}/verify', [App\Http\Controllers\PaymentController::class, 'verify'])->name('verify');
         Route::post('/{id}/reject', [App\Http\Controllers\PaymentController::class, 'reject'])->name('reject');
     });
-
 
 // Staff Management (Admin Only)
 Route::prefix('staff')

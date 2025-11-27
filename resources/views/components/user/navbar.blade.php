@@ -59,10 +59,16 @@
                             <button id="userMenuButton" onclick="toggleUserMenu(event)"
                                 class="flex items-center space-x-2 focus:outline-none" aria-haspopup="true"
                                 aria-expanded="false">
-                                <div
-                                    class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                                </div>
+                                @if (auth()->user()->avatar)
+                                    <img src="{{ asset('uploads/avatar/' . auth()->user()->avatar) }}"
+                                        class="w-10 h-10 rounded-full object-cover">
+                                @else
+                                    <div
+                                        class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+                                    </div>
+                                @endif
+
                                 <span class="text-sm font-medium text-gray-900">{{ auth()->user()->name }}</span>
                                 <svg class="w-4 h-4 text-gray-600 transform transition-transform duration-200"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,11 +80,10 @@
                             <div id="userMenuDropdown"
                                 class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden">
 
+                                <a href="{{ route('user.profile.show') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil</a>
                                 <a href="{{ route('user.orders') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pesanan Saya</a>
-
-                                {{-- <a href="{{ route('cart.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Keranjang</a> --}}
 
                                 <div class="border-t my-1"></div>
 
