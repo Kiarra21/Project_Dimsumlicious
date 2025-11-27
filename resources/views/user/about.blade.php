@@ -5,15 +5,19 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section class="py-16" style="background-color: #72BF78;">
-        <div class="container mx-auto px-4">
-            <div class="text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Tentang Kami & Kontak</h1>
-                <p class="text-lg md:text-xl opacity-90 text-white">Kenali lebih dekat
-                    {{ $companyProfile->company_name ?? 'Dimsumlicious' }} dan hubungi kami</p>
-            </div>
+   <section 
+    class="py-16 bg-cover bg-center bg-no-repeat relative"
+    style="background-image: url('{{ asset('storage/' . $companyProfile['hero_image']) }}')">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Tentang Kami & Kontak</h1>
+            <p class="text-lg md:text-xl text-white opacity-90">
+                {{ $companyProfile['tagline'] }}
+            </p>
         </div>
+    </div>
     </section>
+
 
     <!-- About Section -->
     <section class="py-16 bg-gray-50">
@@ -257,6 +261,38 @@
         </div>
     </section>
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

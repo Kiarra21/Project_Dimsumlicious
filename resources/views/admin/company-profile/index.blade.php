@@ -23,6 +23,17 @@
             </div>
         @endif
 
+        @if ($errors->any())
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                <strong class="block mb-2">Ada beberapa masalah saat menyimpan:</strong>
+                <ul class="list-disc list-inside text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Last Update Info -->
         @if ($companyData['last_updated_by'])
             <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
@@ -43,9 +54,39 @@
 
         <!-- Company Profile Form -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
+
             <form action="{{ route('company-profile.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
+                <br>
+                {{-- Upload Images: Logo & Hero (side-by-side on md+) --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="flex flex-col items-center text-center">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Logo Perusahaan</label>
+
+                        @if ($companyData['logo'])
+                            <img src="{{ asset('storage/' . $companyData['logo']) }}"
+                                class="w-32 h-32 object-cover rounded-full mb-3 shadow">
+                        @endif
+
+                        <input type="file" name="logo" accept="image/*"
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG (Max 2MB)</p>
+                    </div>
+
+                    <div class="flex flex-col items-center text-center">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Foto Banner / Hero Image</label>
+
+                        @if ($companyData['hero_image'])
+                            <img src="{{ asset('storage/' . $companyData['hero_image']) }}"
+                                class="w-full max-w-md h-40 object-cover rounded-lg mb-3 shadow">
+                        @endif
+
+                        <input type="file" name="hero_image" accept="image/*"
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG (Max 2MB)</p>
+                    </div>
+                </div>
 
                 <div class="p-6 space-y-6">
                     <!-- Basic Information Section -->
@@ -126,7 +167,8 @@
                     <!-- Operating Hours Section -->
                     <div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -191,35 +233,6 @@
                         </div>
                     </div>
 
-                    <!-- Images Section -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Gambar
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Logo -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Logo Perusahaan</label>
-                                <input type="file" name="logo" accept="image/*"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                <p class="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG (Max 2MB)</p>
-                            </div>
-
-                            <!-- Hero Image -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Hero Image</label>
-                                <input type="file" name="hero_image" accept="image/*"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                <p class="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG (Max 2MB)</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Form Actions -->
