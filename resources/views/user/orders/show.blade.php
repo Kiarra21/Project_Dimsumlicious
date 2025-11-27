@@ -36,28 +36,56 @@
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-xl font-bold text-gray-900 mb-4">Status Pesanan</h2>
                         <div class="flex items-center gap-4">
-                            @if ($order->status === 'pending_payment')
-                                <span
-                                    class="px-4 py-2 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu
-                                    Pembayaran</span>
-                            @elseif ($order->status === 'pending')
-                                <span
-                                    class="px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">Diproses</span>
-                            @elseif ($order->status === 'preparing')
-                                <span
-                                    class="px-4 py-2 text-sm font-semibold rounded-full bg-purple-100 text-purple-800">Disiapkan</span>
-                            @elseif ($order->status === 'ready')
-                                <span
-                                    class="px-4 py-2 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800">Siap
-                                    Diambil</span>
-                            @elseif ($order->status === 'completed')
-                                <span
-                                    class="px-4 py-2 text-sm font-semibold rounded-full bg-green-100 text-green-800">Selesai</span>
-                            @elseif ($order->status === 'cancelled')
-                                <span
-                                    class="px-4 py-2 text-sm font-semibold rounded-full bg-red-100 text-red-800">Dibatalkan</span>
+                            {{-- ORDER STATUS --}}
+                            @if ($order->payment)
+                                @if ($order->payment->status === 'pending' && !$order->payment->proof_image)
+                                    <span
+                                        class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Belum Upload Bukti Pembayaran
+                                    </span>
+                                @elseif ($order->payment->status === 'pending' && $order->payment->proof_image)
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        Menunggu Verifikasi Pembayaran
+                                    </span>
+                                @elseif ($order->payment->status === 'verified')
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        Pembayaran Terverifikasi
+                                    </span>
+                                @elseif ($order->payment->status === 'rejected')
+                                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                                        <p class="text-sm text-red-800 mb-1">✗ Pembayaran ditolak</p>
+
+                                        @if ($order->payment->verification_notes)
+                                            <p class="text-xs text-red-700">
+                                                Alasan: {{ $order->payment->verification_notes }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                @endif
                             @endif
 
+                            {{-- STATUS ORDER --}}
+                            @if ($order->status === 'pending')
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Menunggu Pembayaran
+                                </span>
+                            @elseif ($order->status === 'pending_cooking')
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Diproses
+                                </span>
+                            @elseif ($order->status === 'ready')
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                                    Siap Diambil
+                                </span>
+                            @elseif ($order->status === 'completed')
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    Selesai
+                                </span>
+                            @elseif ($order->status === 'cancelled')
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                    Dibatalkan
+                                </span>
+                            @endif
                             <span class="text-sm text-gray-600">{{ $order->created_at->format('d M Y, H:i') }}</span>
                         </div>
                     </div>
@@ -110,6 +138,11 @@
                             <div>
                                 <p class="text-sm text-gray-600">Nomor Telepon</p>
                                 <p class="text-gray-900">{{ $order->phone_number ?? ($order->user->phone ?? '-') }}</p>
+                            </div>
+
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-600 mb-1">Catatan Pemesanan</p>
+                                <span class="text-gray-900 whitespace-pre-line">{{ $order->customer_notes ?: '-' }}</span>
                             </div>
                         </div>
                     </div>
@@ -176,7 +209,7 @@
                                 </div>
                             @endif
 
-                            @if (in_array($order->payment->status, ['pending', 'rejected']))
+                            @if ($order->payment->status === 'pending')
                                 <!-- QRIS Image -->
                                 <div class="mb-4">
                                     <p class="text-sm font-medium text-gray-700 mb-2">Scan QRIS untuk melakukan pembayaran:
@@ -205,6 +238,7 @@
                                     </button>
                                 </form>
                             @endif
+
 
                             <div class="mt-4 pt-4 border-t">
                                 <p class="text-xs text-gray-500">

@@ -49,7 +49,10 @@ class PaymentController extends Controller
         $payment = Payment::with(['order.user', 'order.orderItems.product', 'verifiedBy'])
             ->findOrFail($id);
 
-        return view('admin.payments.show', compact('payment'));
+        // Ensure the view has an `$order` variable (some views expect it)
+        $order = $payment->order;
+
+        return view('admin.payments.show', compact('payment', 'order'));
     }
 
     /**
@@ -83,10 +86,12 @@ class PaymentController extends Controller
 
         $payment = Payment::findOrFail($id);
 
+        // Use 'verification_notes' field on payments table to store rejection notes
         $payment->status = 'rejected';
-        $payment->rejection_reason = $request->rejection_reason;
-        $payment->rejected_at = now();
+        $payment->verification_notes = $request->rejection_reason;
+        // store who performed the rejection and when in verified_by / verified_at
         $payment->verified_by = auth()->id();
+        $payment->verified_at = now();
         $payment->save();
 
         return redirect()->back()->with('success', 'Pembayaran ditolak. User dapat mengupload ulang bukti pembayaran.');

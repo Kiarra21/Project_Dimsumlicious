@@ -22,35 +22,35 @@
                     @foreach ($orders as $order)
                         <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                             <!-- Order Header -->
-                            <div class="flex items-center justify-between mb-4 pb-4 border-b">
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-900">{{ $order->order_number }}</h3>
-                                    <p class="text-sm text-gray-600">{{ $order->created_at->format('d M Y, H:i') }}</p>
-                                </div>
-                                <div class="text-right">
-                                    @if ($order->status === 'pending_payment')
-                                        <span
-                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu
-                                            Pembayaran</span>
-                                    @elseif ($order->status === 'pending')
-                                        <span
-                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Diproses</span>
-                                    @elseif ($order->status === 'preparing')
-                                        <span
-                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">Disiapkan</span>
-                                    @elseif ($order->status === 'ready')
-                                        <span
-                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">Siap
-                                            Diambil</span>
-                                    @elseif ($order->status === 'completed')
-                                        <span
-                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Selesai</span>
-                                    @elseif ($order->status === 'cancelled')
-                                        <span
-                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Dibatalkan</span>
-                                    @endif
-                                </div>
+                            <div class="text-right">
+                                @if ($order->payment && $order->payment->status === 'pending')
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Menunggu Verifikasi Pembayaran
+                                    </span>
+                                @elseif ($order->payment && $order->payment->status === 'rejected')
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                        Pembayaran Ditolak
+                                    </span>
+                                @elseif ($order->payment && $order->payment->status === 'verified')
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        Pembayaran Terverifikasi
+                                    </span>
+                                @endif
+
+                                {{-- Status dari tabel orders --}}
+                                @if ($order->status === 'pending_cooking')
+                                    <span
+                                        class="ml-2 px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Diproses
+                                    </span>
+                                @elseif ($order->status === 'completed')
+                                    <span
+                                        class="ml-2 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        Selesai
+                                    </span>
+                                @endif
                             </div>
+
 
                             <!-- Order Items Preview -->
                             <div class="mb-4">
