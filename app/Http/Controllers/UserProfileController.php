@@ -37,13 +37,15 @@ class UserProfileController extends Controller
         // Upload avatar jika ada file baru
         if ($request->hasFile('avatar')) {
             // Hapus avatar lama jika ada
-            if ($user->avatar && file_exists(public_path('uploads/avatar/' . $user->avatar))) {
-                unlink(public_path('uploads/avatar/' . $user->avatar));
+            if ($user->avatar && Storage::disk('public')->exists('avatar/' . $user->avatar)) {
+                Storage::disk('public')->delete('avatar/' . $user->avatar);
             }
 
-            $file = $request->file('avatar');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/avatar'), $filename);
+            // Simpan avatar baru ke storage/app/public/avatar
+            $path = $request->file('avatar')->store('avatar', 'public');
+
+            // Ambil nama file
+            $filename = basename($path);
 
             $validated['avatar'] = $filename;
         }
