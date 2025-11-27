@@ -12,7 +12,13 @@
 
                 <div>
                     <h1 class="text-white font-bold text-lg">Dimsumlicious</h1>
-                    <p class="text-white text-xs opacity-90">Admin Panel</p>
+                    @if (auth()->user()->role_id == 1)
+                        <p class="text-white text-xs opacity-90">Admin Panel</p>
+                    @elseif(auth()->user()->role_id == 2)
+                        <p class="text-white text-xs opacity-90">Staff Panel</p>
+                    @else
+                        <p class="text-white text-xs opacity-90">User Panel</p>
+                    @endif
                 </div>
             </div>
         </div>

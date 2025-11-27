@@ -160,10 +160,6 @@
                             class="px-3 py-1 bg-primary text-white rounded-full text-sm hover:bg-secondary transition-colors duration-300">
                             Bulanan
                         </button>
-                        <button
-                            class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm hover:bg-gray-300 transition-colors duration-300">
-                            Mingguan
-                        </button>
                     </div>
                 </div>
 
