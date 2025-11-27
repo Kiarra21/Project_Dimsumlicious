@@ -8,12 +8,10 @@
     <!-- Welcome Section -->
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
         <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center bounce-gentle">
-                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                </svg>
+            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center overflow-hidden">
+                <img src="{{ asset('asset/foto/logo/dimsum.png') }}" class="w-full h-full object-cover" alt="Company Logo">
             </div>
+
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">
                     Halo, <span class="text-primary">{{ $username ?? 'Admin' }}</span>!

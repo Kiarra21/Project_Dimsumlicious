@@ -46,12 +46,12 @@
                     <div
                         class="w-full h-96 bg-white/20 backdrop-blur-sm rounded-3xl shadow-2xl flex items-center justify-center border-4 border-white/30">
                         <div class="text-center text-white">
-                            <svg class="w-48 h-48 mx-auto mb-4 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                            </svg>
+                            <img src="{{ asset('asset/foto/logo/dimsum.png') }}" class="w-60 h-60 rounded-full object-cover"
+                                alt="Company Logo">
+                            <br>
                             <p class="text-2xl font-bold drop-shadow-lg">Dimsum Berkualitas</p>
                         </div>
+
                     </div>
                 </div>
             </div>
