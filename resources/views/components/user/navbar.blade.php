@@ -60,7 +60,7 @@
                                 class="flex items-center space-x-2 focus:outline-none" aria-haspopup="true"
                                 aria-expanded="false">
                                 @if (auth()->user()->avatar)
-                                    <img src="{{ asset('uploads/avatar/' . auth()->user()->avatar) }}"
+                                    <img src="{{ asset('storage/avatar/' . auth()->user()->avatar) }}"
                                         class="w-10 h-10 rounded-full object-cover">
                                 @else
                                     <div

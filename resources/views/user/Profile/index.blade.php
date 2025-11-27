@@ -24,7 +24,7 @@
                         <div class="text-center">
                             <div class="w-24 h-24 mx-auto mb-4">
                                 @if ($user->avatar)
-                                    <img src="{{ asset('uploads/avatar/' . $user->avatar) }}"
+                                    <img src="{{ asset('storage/avatar/' . $user->avatar) }}"
                                         class="w-24 h-24 rounded-full object-cover mx-auto shadow">
                                 @else
                                     <div
